@@ -272,6 +272,86 @@
             ctx.stroke();
             ctx.lineWidth = 1;
 
+            // Draw Arms with Hands
+            const armGradient = ctx.createLinearGradient(
+                eggMan.x, eggMan.y + 50,
+                eggMan.x + eggMan.width, eggMan.y + 50
+            );
+            armGradient.addColorStop(0, '#FFE566');
+            armGradient.addColorStop(0.5, '#FFD700');
+            armGradient.addColorStop(1, '#FFC600');
+
+            ctx.fillStyle = armGradient;
+            ctx.strokeStyle = '#B4A120';
+            ctx.lineWidth = 8;
+
+            // Left arm and hand
+            ctx.beginPath();
+            ctx.moveTo(eggMan.x + 5, eggMan.y + 50);
+            let leftHandX, leftHandY;
+            if (dragging && isNearMouth() || eggMan.celebrating) {
+                // Arms up when feeding or celebrating
+                leftHandX = eggMan.x - 15;
+                leftHandY = eggMan.y + 30;
+                ctx.quadraticCurveTo(
+                    eggMan.x - 20, eggMan.y + 40,
+                    leftHandX, leftHandY
+                );
+            } else {
+                // Arms down when idle
+                leftHandX = eggMan.x - 15;
+                leftHandY = eggMan.y + 70;
+                ctx.quadraticCurveTo(
+                    eggMan.x - 20, eggMan.y + 60,
+                    leftHandX, leftHandY
+                );
+            }
+            ctx.stroke();
+
+            // Left hand
+            ctx.beginPath();
+            ctx.arc(leftHandX, leftHandY, 6, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFE566';
+            ctx.fill();
+            ctx.strokeStyle = '#B4A120';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Right arm and hand
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(eggMan.x + eggMan.width - 5, eggMan.y + 50);
+            let rightHandX, rightHandY;
+            if (dragging && isNearMouth() || eggMan.celebrating) {
+                // Arms up when feeding or celebrating
+                rightHandX = eggMan.x + eggMan.width + 15;
+                rightHandY = eggMan.y + 30;
+                ctx.quadraticCurveTo(
+                    eggMan.x + eggMan.width + 20, eggMan.y + 40,
+                    rightHandX, rightHandY
+                );
+            } else {
+                // Arms down when idle
+                rightHandX = eggMan.x + eggMan.width + 15;
+                rightHandY = eggMan.y + 70;
+                ctx.quadraticCurveTo(
+                    eggMan.x + eggMan.width + 20, eggMan.y + 60,
+                    rightHandX, rightHandY
+                );
+            }
+            ctx.stroke();
+
+            // Right hand
+            ctx.beginPath();
+            ctx.arc(rightHandX, rightHandY, 6, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFE566';
+            ctx.fill();
+            ctx.strokeStyle = '#B4A120';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.lineWidth = 1;
+
             // Draw Egg Man Legs with gradient
             const legGradient = ctx.createLinearGradient(
                 eggMan.x, eggMan.y + 90,
@@ -282,6 +362,29 @@
             ctx.fillStyle = legGradient;
             ctx.fillRect(eggMan.x + 10, eggMan.y + 90, 10, 30);
             ctx.fillRect(eggMan.x + 40, eggMan.y + 90, 10, 30);
+
+            // Draw Shoes
+            ctx.fillStyle = '#000000';
+
+            // Left shoe
+            ctx.beginPath();
+            ctx.moveTo(eggMan.x + 5, eggMan.y + 120);
+            ctx.lineTo(eggMan.x + 25, eggMan.y + 120);
+            ctx.quadraticCurveTo(
+                eggMan.x + 25, eggMan.y + 125,
+                eggMan.x + 5, eggMan.y + 125
+            );
+            ctx.fill();
+
+            // Right shoe
+            ctx.beginPath();
+            ctx.moveTo(eggMan.x + 35, eggMan.y + 120);
+            ctx.lineTo(eggMan.x + 55, eggMan.y + 120);
+            ctx.quadraticCurveTo(
+                eggMan.x + 55, eggMan.y + 125,
+                eggMan.x + 35, eggMan.y + 125
+            );
+            ctx.fill();
 
             // Draw Eyes with highlight
             ctx.fillStyle = '#000000';
@@ -299,20 +402,21 @@
 
             // Draw Mouth with gradient
             if (eggMan.mouthOpen) {
-                // Draw O-shaped mouth when feeding
+                // Draw larger O-shaped mouth when feeding
                 ctx.beginPath();
-                ctx.arc(eggMan.x + eggMan.width / 2, eggMan.y + 60, 12, 0, Math.PI * 2);
+                ctx.arc(eggMan.x + eggMan.width / 2, eggMan.y + 60, 18, 0, Math.PI * 2);
 
                 // Create a darker inner circle for depth
                 const mouthGradient = ctx.createRadialGradient(
                     eggMan.x + eggMan.width / 2,
                     eggMan.y + 60,
-                    4,
+                    6,
                     eggMan.x + eggMan.width / 2,
                     eggMan.y + 60,
-                    12
+                    18
                 );
                 mouthGradient.addColorStop(0, '#400000');
+                mouthGradient.addColorStop(0.6, '#600000');
                 mouthGradient.addColorStop(1, '#800000');
                 ctx.fillStyle = mouthGradient;
                 ctx.fill();
@@ -321,9 +425,9 @@
 
                 // Add a highlight to the top of the mouth
                 ctx.beginPath();
-                ctx.arc(eggMan.x + eggMan.width / 2, eggMan.y + 57, 10, Math.PI * 1.2, Math.PI * 1.8);
+                ctx.arc(eggMan.x + eggMan.width / 2, eggMan.y + 55, 15, Math.PI * 1.2, Math.PI * 1.8);
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 3;
                 ctx.stroke();
                 ctx.lineWidth = 1;
             } else {
@@ -373,6 +477,10 @@
         }
 
         // Add shadow effect to dialog
+        function hideDialog() {
+            dialogBox.style.display = "none";
+        }
+
         function showDialog(message) {
             dialogMessage.textContent = message;
             dialogBox.style.display = "block";
@@ -387,7 +495,7 @@
         const dialogOk = document.getElementById("dialogOk");
         const dialogCancel = document.getElementById("dialogCancel");
 
-        let eggsLeft = 40;
+        let eggsLeft = 10;
         let dragging = false;
         let dragOffsetX = 0;
         let dragOffsetY = 0;
@@ -404,10 +512,12 @@
             y: 120,
             width: 60,
             height: 100,
-            mouthOpen: false
+            mouthOpen: false,
+            celebrating: false,
+            walkProgress: 0
         };
 
-        let basketEggs = Array.from({ length: eggsLeft }, (_, i) => ({
+        let basketEggs = Array.from({ length: eggsLeft - 1 }, (_, i) => ({
             x: 310 + (i % 5) * 10,
             y: 280 - Math.floor(i / 5) * 10
         }));
@@ -427,9 +537,9 @@
         }
 
         function resetGame() {
-            eggsLeft = 40;
+            eggsLeft = 10;
             eggCounterDisplay.textContent = eggsLeft;
-            basketEggs = Array.from({ length: eggsLeft }, (_, i) => ({
+            basketEggs = Array.from({ length: eggsLeft - 1 }, (_, i) => ({
                 x: 310 + (i % 5) * 10,
                 y: 280 - Math.floor(i / 5) * 10
             }));
@@ -438,7 +548,7 @@
         }
 
         function addMoreEggs() {
-            eggsLeft = 80;
+            eggsLeft = 20;
             eggCounterDisplay.textContent = eggsLeft;
             basketEggs = Array.from({ length: eggsLeft }, (_, i) => ({
                 x: 310 + (i % 5) * 10,
@@ -487,19 +597,44 @@
             eggMan.mouthOpen = isNearMouth();
         }
 
+        function startCelebration() {
+            eggMan.celebrating = true;
+            eggMan.walkProgress = 0;
+        }
+
+        function updateCelebration() {
+            if (!eggMan.celebrating) return;
+
+            // Calculate target position (center of screen)
+            const targetX = canvas.width / 2 - eggMan.width / 2;
+
+            // Update position
+            if (eggMan.walkProgress < 1) {
+                eggMan.walkProgress += 0.02;  // Control walking speed
+                eggMan.x = 80 + (targetX - 80) * eggMan.walkProgress;
+
+                // Add bobbing motion while walking
+                eggMan.y = 120 + Math.sin(eggMan.walkProgress * Math.PI * 8) * 5;
+            }
+        }
+
         function handleInteractionEnd() {
             if (dragging && isNearMouth() && eggsLeft > 0) {
                 eggsLeft--;
                 eggCounterDisplay.textContent = eggsLeft;
                 basketEggs.pop();
 
-                if (eggsLeft === 0) {
-                    showDialog("Congratulations, Big Boy!\nWould you like to buy 80 more eggs?");
-                    dialogOk.onclick = () => {
-                        addMoreEggs();
-                        hideDialog();
-                    };
-                    dialogCancel.onclick = hideDialog;
+                if (eggsLeft === 0 && !eggMan.celebrating) {
+                    if (basketEggs.length === 19) {  // Just finished all 20 eggs
+                        startCelebration();
+                    } else {
+                        showDialog("Congratulations, Big Boy!\nWould you like to buy 20 more eggs?");
+                        dialogOk.onclick = () => {
+                            addMoreEggs();
+                            hideDialog();
+                        };
+                        dialogCancel.onclick = hideDialog;
+                    }
                 } else {
                     egg.x = 300;
                     egg.y = 200;
@@ -530,6 +665,7 @@
         canvas.addEventListener("mouseleave", handleInteractionEnd);
 
         function gameLoop() {
+            updateCelebration();
             drawGame();
             requestAnimationFrame(gameLoop);
         }
