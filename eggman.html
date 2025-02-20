@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Egg Man Game - Windows 3.11</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #007575 0%, #009393 100%);
+            font-family: "Courier New", monospace;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .win311-window {
+            width: 420px;
+            height: 380px;
+            background: linear-gradient(to bottom, #d4d4d4, #c0c0c0);
+            border: 3px solid #808080;
+            box-shadow:
+                inset 2px 2px 0px #FFFFFF,
+                inset -2px -2px 0px #808080,
+                5px 5px 15px rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            margin: auto;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 2px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .title-bar {
+            background: linear-gradient(to right, #000080, #0000a0);
+            color: white;
+            padding: 4px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: bold;
+            width: 100%;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+        }
+
+        .divider {
+            height: 2px;
+            background: linear-gradient(to right, #808080, #a0a0a0, #808080);
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        .dialog-box {
+            display: none;
+            position: absolute;
+            width: 300px;
+            background: linear-gradient(to bottom, #d4d4d4, #c0c0c0);
+            border: 3px solid #808080;
+            box-shadow:
+                inset 2px 2px 0px #FFFFFF,
+                inset -2px -2px 0px #808080,
+                0 0 20px rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            text-align: center;
+            font-family: "Courier New", monospace;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 5px #FFD700;
+            }
+
+            50% {
+                box-shadow: 0 0 20px #FFD700;
+            }
+
+            100% {
+                box-shadow: 0 0 5px #FFD700;
+            }
+        }
+
+        .dialog-buttons {
+            margin-top: 15px;
+        }
+
+        .dialog-button {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 2px solid #808080;
+            box-shadow:
+                inset 1px 1px #FFFFFF,
+                inset -1px -1px #808080,
+                2px 2px 5px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+            padding: 6px 12px;
+            margin: 5px;
+            cursor: pointer;
+            min-width: 80px;
+            transition: all 0.2s ease;
+        }
+
+        .dialog-button:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+            transform: translateY(-1px);
+        }
+
+        .dialog-button:active {
+            background: linear-gradient(to bottom, #b0b0b0, #c0c0c0);
+            transform: translateY(1px);
+        }
+
+        canvas {
+            width: 400px;
+            height: 300px;
+            border: 2px solid #808080;
+            background: linear-gradient(to bottom right, #e6f3ff, #ffffff);
+            cursor: pointer;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        #eggCounter {
+            font-size: 16px;
+            font-weight: bold;
+            color: #000080;
+            text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="win311-window">
+        <div class="title-bar">Enhanced Egg Man Game</div>
+        <div class="divider"></div>
+        <p>Eggs Left: <span id="eggCounter">40</span></p>
+        <canvas id="gameCanvas" width="400" height="300"></canvas>
+    </div>
+
+    <div id="dialogBox" class="dialog-box">
+        <p id="dialogMessage"></p>
+        <div class="dialog-buttons">
+            <button class="dialog-button" id="dialogOk">Buy More!</button>
+            <button class="dialog-button" id="dialogCancel">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Previous JavaScript code remains the same, but we'll enhance the drawing functions
+
+        function drawEggGradient(x, y, width, height) {
+            const gradient = ctx.createRadialGradient(
+                x + width / 2 - width / 6,
+                y + height / 2 - height / 6,
+                width / 10,
+                x + width / 2,
+                y + height / 2,
+                width / 1.5
+            );
+            gradient.addColorStop(0, '#FFFFFF');
+            gradient.addColorStop(0.7, '#F0F0F0');
+            gradient.addColorStop(1, '#E0E0E0');
+            return gradient;
+        }
+
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw background details
+            ctx.fillStyle = '#E6F0FF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height / 2);
+
+            // Draw Basket with enhanced graphics
+            const basketGradient = ctx.createLinearGradient(300, 250, 300, 300);
+            basketGradient.addColorStop(0, '#A65D1E');
+            basketGradient.addColorStop(1, '#8B4513');
+            ctx.fillStyle = basketGradient;
+            ctx.fillRect(300, 250, 80, 50);
+
+            // Basket weave pattern
+            ctx.strokeStyle = '#734A12';
+            for (let i = 0; i < 5; i++) {
+                ctx.beginPath();
+                ctx.moveTo(300, 260 + i * 8);
+                ctx.lineTo(380, 260 + i * 8);
+                ctx.stroke();
+            }
+
+            ctx.fillStyle = '#553311';
+            ctx.font = '12px Courier New';
+            ctx.fillText("Basket", 320, 290);
+
+            // Draw Eggs in Basket with gradient
+            basketEggs.forEach(eggPos => {
+                const eggGradient = ctx.createRadialGradient(
+                    eggPos.x, eggPos.y, 1,
+                    eggPos.x, eggPos.y, 7
+                );
+                eggGradient.addColorStop(0, '#FFFFFF');
+                eggGradient.addColorStop(1, '#F0F0F0');
+
+                ctx.fillStyle = eggGradient;
+                ctx.beginPath();
+                ctx.ellipse(eggPos.x, eggPos.y, 5, 7, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Add shine
+                ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+                ctx.beginPath();
+                ctx.arc(eggPos.x - 2, eggPos.y - 2, 2, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+
+            // Draw Egg Man Body with enhanced graphics
+            const eggManGradient = ctx.createRadialGradient(
+                eggMan.x + eggMan.width / 2,
+                eggMan.y + eggMan.height / 2,
+                10,
+                eggMan.x + eggMan.width / 2,
+                eggMan.y + eggMan.height / 2,
+                50
+            );
+            eggManGradient.addColorStop(0, '#FFE566');
+            eggManGradient.addColorStop(0.8, '#FFD700');
+            eggManGradient.addColorStop(1, '#FFC600');
+
+            ctx.fillStyle = eggManGradient;
+            ctx.beginPath();
+            ctx.ellipse(
+                eggMan.x + eggMan.width / 2,
+                eggMan.y + eggMan.height / 2,
+                30,
+                45,
+                0,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+
+            // Add shine effect to Egg Man
+            const shine = ctx.createLinearGradient(
+                eggMan.x, eggMan.y,
+                eggMan.x + eggMan.width,
+                eggMan.y + eggMan.height
+            );
+            shine.addColorStop(0, 'rgba(255,255,255,0.2)');
+            shine.addColorStop(0.5, 'rgba(255,255,255,0)');
+            shine.addColorStop(1, 'rgba(255,255,255,0.1)');
+            ctx.fillStyle = shine;
+            ctx.fill();
+
+            ctx.strokeStyle = '#B4A120';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.lineWidth = 1;
+
+            // Draw Egg Man Legs with gradient
+            const legGradient = ctx.createLinearGradient(
+                eggMan.x, eggMan.y + 90,
+                eggMan.x, eggMan.y + 120
+            );
+            legGradient.addColorStop(0, '#333333');
+            legGradient.addColorStop(1, '#000000');
+            ctx.fillStyle = legGradient;
+            ctx.fillRect(eggMan.x + 10, eggMan.y + 90, 10, 30);
+            ctx.fillRect(eggMan.x + 40, eggMan.y + 90, 10, 30);
+
+            // Draw Eyes with highlight
+            ctx.fillStyle = '#000000';
+            ctx.beginPath();
+            ctx.arc(eggMan.x + 15, eggMan.y + 35, 5, 0, Math.PI * 2);
+            ctx.arc(eggMan.x + 45, eggMan.y + 35, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Add eye highlights
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.arc(eggMan.x + 16, eggMan.y + 34, 2, 0, Math.PI * 2);
+            ctx.arc(eggMan.x + 46, eggMan.y + 34, 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw Mouth with gradient
+            if (eggMan.mouthOpen) {
+                // Draw O-shaped mouth when feeding
+                ctx.beginPath();
+                ctx.arc(eggMan.x + eggMan.width / 2, eggMan.y + 60, 12, 0, Math.PI * 2);
+
+                // Create a darker inner circle for depth
+                const mouthGradient = ctx.createRadialGradient(
+                    eggMan.x + eggMan.width / 2,
+                    eggMan.y + 60,
+                    4,
+                    eggMan.x + eggMan.width / 2,
+                    eggMan.y + 60,
+                    12
+                );
+                mouthGradient.addColorStop(0, '#400000');
+                mouthGradient.addColorStop(1, '#800000');
+                ctx.fillStyle = mouthGradient;
+                ctx.fill();
+                ctx.strokeStyle = '#000000';
+                ctx.stroke();
+
+                // Add a highlight to the top of the mouth
+                ctx.beginPath();
+                ctx.arc(eggMan.x + eggMan.width / 2, eggMan.y + 57, 10, Math.PI * 1.2, Math.PI * 1.8);
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.lineWidth = 1;
+            } else {
+                // Regular smiling mouth when not feeding
+                ctx.beginPath();
+                ctx.arc(eggMan.x + eggMan.width / 2, eggMan.y + 60, 12, 0, Math.PI, true);
+                ctx.fillStyle = '#FF0000';
+                ctx.strokeStyle = '#000000';
+                ctx.stroke();
+                ctx.fill();
+            }
+
+            // Draw Draggable Egg with gradient and shine
+            if (eggsLeft > 0) {
+                // Main egg gradient
+                ctx.fillStyle = drawEggGradient(egg.x, egg.y, egg.width, egg.height);
+                ctx.beginPath();
+                ctx.ellipse(
+                    egg.x + egg.width / 2,
+                    egg.y + egg.height / 2,
+                    egg.width / 2,
+                    egg.height / 2,
+                    0,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+
+                // Egg outline
+                ctx.strokeStyle = '#CCCCCC';
+                ctx.stroke();
+
+                // Add shine effect
+                ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                ctx.beginPath();
+                ctx.ellipse(
+                    egg.x + egg.width / 3,
+                    egg.y + egg.height / 3,
+                    egg.width / 6,
+                    egg.height / 6,
+                    Math.PI / 4,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+            }
+        }
+
+        // Add shadow effect to dialog
+        function showDialog(message) {
+            dialogMessage.textContent = message;
+            dialogBox.style.display = "block";
+            dialogBox.style.animation = "popIn 0.3s ease-out";
+        }
+
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const eggCounterDisplay = document.getElementById("eggCounter");
+        const dialogBox = document.getElementById("dialogBox");
+        const dialogMessage = document.getElementById("dialogMessage");
+        const dialogOk = document.getElementById("dialogOk");
+        const dialogCancel = document.getElementById("dialogCancel");
+
+        let eggsLeft = 40;
+        let dragging = false;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        let egg = {
+            x: 300,
+            y: 200,
+            width: 30,
+            height: 40,
+        };
+
+        let eggMan = {
+            x: 80,
+            y: 120,
+            width: 60,
+            height: 100,
+            mouthOpen: false
+        };
+
+        let basketEggs = Array.from({ length: eggsLeft }, (_, i) => ({
+            x: 310 + (i % 5) * 10,
+            y: 280 - Math.floor(i / 5) * 10
+        }));
+
+        function isNearMouth() {
+            const mouthX = eggMan.x + eggMan.width / 2;
+            const mouthY = eggMan.y + 60;
+            const eggCenterX = egg.x + egg.width / 2;
+            const eggCenterY = egg.y + egg.height / 2;
+
+            const distance = Math.sqrt(
+                Math.pow(mouthX - eggCenterX, 2) +
+                Math.pow(mouthY - eggCenterY, 2)
+            );
+
+            return distance < 30;
+        }
+
+        function resetGame() {
+            eggsLeft = 40;
+            eggCounterDisplay.textContent = eggsLeft;
+            basketEggs = Array.from({ length: eggsLeft }, (_, i) => ({
+                x: 310 + (i % 5) * 10,
+                y: 280 - Math.floor(i / 5) * 10
+            }));
+            egg.x = 300;
+            egg.y = 200;
+        }
+
+        function addMoreEggs() {
+            eggsLeft = 80;
+            eggCounterDisplay.textContent = eggsLeft;
+            basketEggs = Array.from({ length: eggsLeft }, (_, i) => ({
+                x: 310 + (i % 5) * 10,
+                y: 280 - Math.floor(i / 5) * 10
+            }));
+            egg.x = 300;
+            egg.y = 200;
+        }
+
+        function handleInteractionStart(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            const mouseX = (e.clientX - rect.left) * scaleX;
+            const mouseY = (e.clientY - rect.top) * scaleY;
+
+            if (eggsLeft > 0 &&
+                mouseX > egg.x &&
+                mouseX < egg.x + egg.width &&
+                mouseY > egg.y &&
+                mouseY < egg.y + egg.height) {
+                dragging = true;
+                dragOffsetX = mouseX - egg.x;
+                dragOffsetY = mouseY - egg.y;
+            }
+        }
+
+        function handleInteractionMove(e) {
+            if (!dragging) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            const mouseX = (e.clientX - rect.left) * scaleX;
+            const mouseY = (e.clientY - rect.top) * scaleY;
+
+            egg.x = mouseX - dragOffsetX;
+            egg.y = mouseY - dragOffsetY;
+
+            // Keep egg within canvas bounds
+            egg.x = Math.max(0, Math.min(canvas.width - egg.width, egg.x));
+            egg.y = Math.max(0, Math.min(canvas.height - egg.height, egg.y));
+
+            eggMan.mouthOpen = isNearMouth();
+        }
+
+        function handleInteractionEnd() {
+            if (dragging && isNearMouth() && eggsLeft > 0) {
+                eggsLeft--;
+                eggCounterDisplay.textContent = eggsLeft;
+                basketEggs.pop();
+
+                if (eggsLeft === 0) {
+                    showDialog("Congratulations, Big Boy!\nWould you like to buy 80 more eggs?");
+                    dialogOk.onclick = () => {
+                        addMoreEggs();
+                        hideDialog();
+                    };
+                    dialogCancel.onclick = hideDialog;
+                } else {
+                    egg.x = 300;
+                    egg.y = 200;
+                }
+            }
+            dragging = false;
+            eggMan.mouthOpen = false;
+        }
+
+        // Add touch support
+        canvas.addEventListener("touchstart", (e) => {
+            e.preventDefault();
+            handleInteractionStart(e.touches[0]);
+        });
+        canvas.addEventListener("touchmove", (e) => {
+            e.preventDefault();
+            handleInteractionMove(e.touches[0]);
+        });
+        canvas.addEventListener("touchend", (e) => {
+            e.preventDefault();
+            handleInteractionEnd();
+        });
+
+        // Add mouse support
+        canvas.addEventListener("mousedown", handleInteractionStart);
+        canvas.addEventListener("mousemove", handleInteractionMove);
+        canvas.addEventListener("mouseup", handleInteractionEnd);
+        canvas.addEventListener("mouseleave", handleInteractionEnd);
+
+        function gameLoop() {
+            drawGame();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Initialize the game
+        gameLoop();
+    </script>
+</body>
+
+</html>
