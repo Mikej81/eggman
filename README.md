@@ -1,2 +1,2 @@
 # eggman
-I am the egg man
+I am the egg man, koo-koo-kachoo
